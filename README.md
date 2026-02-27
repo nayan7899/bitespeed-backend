@@ -8,7 +8,7 @@
 > (Add after deployment)
 
 ```
-POST https://your-deployed-url.com/identify
+POST https://bitespeed-backend-2rkt.onrender.com/identify
 ```
 
 Local:
