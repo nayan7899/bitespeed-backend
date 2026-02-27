@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BiteSpeed Backend Explorer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans p-6 md:p-12">
+  <div class="max-w-3xl mx-auto space-y-6">
+    
+    <div class="border-b pb-4">
+      <h1 class="text-3xl font-bold text-gray-900">BiteSpeed Backend Explorer</h1>
+      <p class="text-gray-600 mt-2 text-sm">A simple interface for reviewers to test and verify backend functionality.</p>
+    </div>
+
+    <div class="bg-yellow-50 border border-yellow-200 text-yellow-800 p-4 rounded-md flex gap-3 text-sm items-start">
+      <span class="text-yellow-600 font-bold">ⓘ</span>
+      <p><strong>Deployment Notice:</strong> This service is hosted on a free tier. If it has been inactive, it may take <strong>up to 60 seconds</strong> for the first request to process (Cold Start). Please be patient!</p>
+    </div>
+
+    <div class="bg-white p-6 rounded-lg border shadow-sm space-y-4">
+      <div class="flex items-center gap-3">
+        <span class="bg-green-500 text-white px-2 py-1 rounded text-xs font-bold tracking-wider">POST</span>
+        <code class="bg-blue-50 text-blue-800 px-2 py-1 rounded font-mono text-sm">/identify</code>
+      </div>
+      <p class="text-sm text-gray-600">Consolidates contact identities based on email or phone number.</p>
+
+      <form id="identify-form" class="space-y-4 pt-2">
+        <div>
+          <label class="block text-sm font-bold mb-1">Email:</label>
+          <input type="email" id="email" placeholder="example@gmail.com" class="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400" />
+        </div>
+        <div>
+          <label class="block text-sm font-bold mb-1">Phone Number:</label>
+          <input type="text" id="phone" placeholder="1234567890" class="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400" />
+        </div>
+        <button type="submit" id="identify-btn" class="bg-blue-500 text-white px-4 py-2 rounded font-medium hover:bg-blue-600 transition duration-150">Send Request</button>
+      </form>
+
+      <pre id="identify-response" class="hidden bg-gray-900 text-green-400 p-4 rounded mt-4 text-xs overflow-x-auto"></pre>
+    </div>
+
+    <div class="bg-white p-6 rounded-lg border shadow-sm space-y-4">
+      <div class="flex items-center gap-3">
+        <span class="bg-blue-400 text-white px-2 py-1 rounded text-xs font-bold tracking-wider">GET</span>
+        <code class="bg-blue-50 text-blue-800 px-2 py-1 rounded font-mono text-sm">/health</code>
+      </div>
+      <p class="text-sm text-gray-600">Checks if the server and database are active.</p>
+      <button id="health-btn" class="bg-blue-500 text-white px-4 py-2 rounded font-medium hover:bg-blue-600 transition duration-150">Check Health</button>
+      
+      <pre id="health-response" class="hidden bg-gray-900 text-green-400 p-4 rounded mt-4 text-xs overflow-x-auto"></pre>
+    </div>
+
+  </div>
+
+  <script>
+    // Handle /identify submission
+    document.getElementById('identify-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('identify-btn');
+      const responseBox = document.getElementById('identify-response');
+      btn.innerText = 'Sending...';
+      
+      const payload = {};
+      const email = document.getElementById('email').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      if (email) payload.email = email;
+      if (phone) payload.phoneNumber = phone;
+
+      try {
+        const res = await fetch('/identify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        responseBox.classList.remove('hidden');
+        responseBox.textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        responseBox.classList.remove('hidden');
+        responseBox.textContent = 'Error: Could not reach the server.';
+      } finally {
+        btn.innerText = 'Send Request';
+      }
+    });
+
+    // Handle /health submission
+    document.getElementById('health-btn').addEventListener('click', async () => {
+      const btn = document.getElementById('health-btn');
+      const responseBox = document.getElementById('health-response');
+      btn.innerText = 'Checking...';
+      
+      try {
+        const res = await fetch('/health');
+        const data = await res.json();
+        responseBox.classList.remove('hidden');
+        responseBox.textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        responseBox.classList.remove('hidden');
+        responseBox.textContent = 'Error: Could not reach the server.';
+      } finally {
+        btn.innerText = 'Check Health';
+      }
+    });
+  </script>
+</body>
+</html>
