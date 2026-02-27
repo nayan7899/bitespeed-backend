@@ -1,9 +1,3 @@
-Perfect. Let’s turn this into a **top 1% Bitespeed submission README** — concise, technical, and reviewer-friendly.
-
-You can directly replace your existing README with this version.
-
----
-
 # 🧠 Bitespeed Backend – Identity Reconciliation Service
 
 ---
